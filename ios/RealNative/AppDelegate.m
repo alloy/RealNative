@@ -1,6 +1,9 @@
 #import "AppDelegate.h"
 
+#import <JavaScriptCore/JavaScriptCore.h>
+
 #import <React/RCTBridge.h>
+#import <React/RCTBridge+Private.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
@@ -22,6 +25,10 @@ static void InitializeFlipper(UIApplication *application) {
   [client start];
 }
 #endif
+
+@interface RCTCxxBridge (Private)
+- (void)realNative_foo;
+@end
 
 @implementation AppDelegate
 
@@ -54,5 +61,29 @@ static void InitializeFlipper(UIApplication *application) {
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
 }
+
+static JSValueRef ObjectCallAsFunctionCallback(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception) {
+    NSLog(@"HELLLLLOOOOO!");
+    return JSValueMakeUndefined(ctx);
+}
+
+- (void)bridgeDidInitializeJSGlobalContext:(void *)contextRef;
+{
+    JSGlobalContextRef globalContext = contextRef;
+    JSObjectRef globalObject = JSContextGetGlobalObject(globalContext);
+    
+    JSStringRef logFunctionName = JSStringCreateWithUTF8CString("log");
+    JSObjectRef functionObject = JSObjectMakeFunctionWithCallback(globalContext, logFunctionName, &ObjectCallAsFunctionCallback);
+
+    JSObjectSetProperty(globalContext, globalObject, logFunctionName, functionObject, kJSPropertyAttributeNone, NULL);
+
+  //        JSStringRef logCallStatement = JSStringCreateWithUTF8CString("log()");
+  //
+  //        JSEvaluateScript(globalContext, logCallStatement, nullptr, nullptr, 1,nullptr);
+
+    JSStringRelease(logFunctionName);
+  //        JSStringRelease(logCallStatement);
+}
+
 
 @end
