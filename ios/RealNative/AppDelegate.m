@@ -62,28 +62,74 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 }
 
-static JSValueRef ObjectCallAsFunctionCallback(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception) {
-    NSLog(@"HELLLLLOOOOO!");
-    return JSValueMakeUndefined(ctx);
+static JSValueRef
+ObjectGet(JSContextRef ctx, JSObjectRef obj, char *key) {
+  JSStringRef keyName = JSStringCreateWithUTF8CString(key);
+  JSValueRef result = JSObjectGetProperty(ctx, obj, keyName, NULL);
+  JSStringRelease(keyName);
+  return result;
+}
+
+static void
+ConsoleLog(JSContextRef ctx, JSValueRef value) {
+  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
+  JSObjectRef consoleObject = (JSObjectRef)ObjectGet(ctx, globalObject, "console");
+  JSObjectRef logFunction = (JSObjectRef)ObjectGet(ctx, consoleObject, "log");
+  JSObjectCallAsFunction(ctx, logFunction, NULL, 1, &value, NULL);
+}
+
+static JSValueRef
+Require(JSContextRef ctx, char *moduleId) {
+  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
+  // This is Metro’s `require` function:
+  // https://github.com/facebook/metro/blob/e8fecfea/packages/metro/src/lib/polyfills/require.js#L65
+  JSObjectRef requireFunction = (JSObjectRef)ObjectGet(ctx, globalObject, "__r");
+
+  JSStringRef moduleIdName = JSStringCreateWithUTF8CString(moduleId);
+  JSValueRef moduleIdNameValue = JSValueMakeString(ctx, moduleIdName);
+  JSValueRef error = NULL;
+  JSValueRef result = JSObjectCallAsFunction(ctx, requireFunction, NULL, 1, &moduleIdNameValue, &error);
+  JSStringRelease(moduleIdName);
+  
+  if (error) {
+    ConsoleLog(ctx, error);
+    return NULL;
+  } else {
+    return result;
+  }
+}
+
+static JSValueRef
+NativeAppComponent(
+  JSContextRef ctx,
+  JSObjectRef function,
+  JSObjectRef thisObject,
+  size_t argumentCount,
+  const JSValueRef arguments[],
+  JSValueRef* exception
+) {
+  JSObjectRef ReactNativeModule = (JSObjectRef)Require(ctx, "node_modules/react-native/index.js");
+  JSObjectRef ReactModule = (JSObjectRef)Require(ctx, "node_modules/react/index.js");
+  JSObjectRef TextComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule, "Text");
+  
+  JSObjectRef props = JSObjectMake(ctx, NULL, NULL);
+  JSStringRef text = JSStringCreateWithUTF8CString("hello world");
+  JSObjectRef createElement = (JSObjectRef)ObjectGet(ctx, ReactModule, "createElement");
+  JSValueRef args[3] = { TextComponent, props, JSValueMakeString(ctx, text) };
+  JSValueRef element = JSObjectCallAsFunction(ctx, createElement, NULL, 3, args, NULL);
+  
+  return element;
 }
 
 - (void)bridgeDidInitializeJSGlobalContext:(void *)contextRef;
 {
-    JSGlobalContextRef globalContext = contextRef;
-    JSObjectRef globalObject = JSContextGetGlobalObject(globalContext);
-    
-    JSStringRef logFunctionName = JSStringCreateWithUTF8CString("log");
-    JSObjectRef functionObject = JSObjectMakeFunctionWithCallback(globalContext, logFunctionName, &ObjectCallAsFunctionCallback);
+  JSGlobalContextRef globalContext = contextRef;
+  JSObjectRef globalObject = JSContextGetGlobalObject(globalContext);
 
-    JSObjectSetProperty(globalContext, globalObject, logFunctionName, functionObject, kJSPropertyAttributeNone, NULL);
-
-  //        JSStringRef logCallStatement = JSStringCreateWithUTF8CString("log()");
-  //
-  //        JSEvaluateScript(globalContext, logCallStatement, nullptr, nullptr, 1,nullptr);
-
-    JSStringRelease(logFunctionName);
-  //        JSStringRelease(logCallStatement);
+  JSStringRef NativeAppComponentName = JSStringCreateWithUTF8CString("NativeAppComponent");
+  JSObjectRef functionObject = JSObjectMakeFunctionWithCallback(globalContext, NativeAppComponentName, &NativeAppComponent);
+  JSObjectSetProperty(globalContext, globalObject, NativeAppComponentName, functionObject, kJSPropertyAttributeNone, NULL);
+  JSStringRelease(NativeAppComponentName);
 }
-
 
 @end
