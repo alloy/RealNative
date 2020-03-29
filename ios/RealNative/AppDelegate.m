@@ -71,6 +71,25 @@ ObjectGet(JSContextRef ctx, JSObjectRef obj, char *key) {
 }
 
 static void
+ObjectSetValue(JSContextRef ctx, JSObjectRef obj, char *key, JSValueRef value) {
+  JSStringRef k = JSStringCreateWithUTF8CString(key);
+  JSObjectSetProperty(ctx, obj, k, value, kJSPropertyAttributeNone, NULL);
+  JSStringRelease(k);
+}
+
+static void
+ObjectSetString(JSContextRef ctx, JSObjectRef obj, char *key, char *value) {
+  JSStringRef v = JSStringCreateWithUTF8CString(value);
+  ObjectSetValue(ctx, obj, key, JSValueMakeString(ctx, v));
+  JSStringRelease(v);
+}
+
+static void
+ObjectSetNumber(JSContextRef ctx, JSObjectRef obj, char *key, double value) {
+  ObjectSetValue(ctx, obj, key, JSValueMakeNumber(ctx, value));
+}
+
+static void
 ConsoleLog(JSContextRef ctx, JSValueRef value) {
   JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
   JSObjectRef consoleObject = (JSObjectRef)ObjectGet(ctx, globalObject, "console");
@@ -100,6 +119,62 @@ Require(JSContextRef ctx, char *moduleId) {
 }
 
 static JSValueRef
+CreateElement(
+  JSContextRef ctx,
+  JSObjectRef component,
+  JSObjectRef props,
+  size_t childCount,
+  JSValueRef *children
+) {
+  JSObjectRef ReactModule = (JSObjectRef)Require(ctx, "node_modules/react/index.js");
+  JSObjectRef createElement = (JSObjectRef)ObjectGet(ctx, ReactModule, "createElement");
+
+  JSValueRef error = NULL;
+  JSObjectRef childArray = JSObjectMakeArray(ctx, childCount, children, &error);
+  if (error) {
+    ConsoleLog(ctx, error);
+    return NULL;
+  }
+
+  JSValueRef args[3] = { component, props, childArray };
+  JSValueRef element = JSObjectCallAsFunction(ctx, createElement, NULL, 3, args, NULL);
+  return element;
+}
+
+static JSObjectRef
+ReactNativeModule(JSContextRef ctx) {
+  return (JSObjectRef)Require(ctx, "node_modules/react-native/index.js");
+}
+
+static JSValueRef
+RenderContainerComponent(JSContextRef ctx, size_t childCount, JSValueRef *children) {
+  JSObjectRef ViewComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "View");
+
+  JSObjectRef containerStyle = JSObjectMake(ctx, NULL, NULL);
+  ObjectSetNumber(ctx, containerStyle, "flex", 1);
+//  ObjectSetString(ctx, containerStyle, "backgroundColor", "red");
+  ObjectSetString(ctx, containerStyle, "justifyContent", "center");
+  ObjectSetString(ctx, containerStyle, "alignItems", "center");
+  
+  JSObjectRef containerProps = JSObjectMake(ctx, NULL, NULL);
+  ObjectSetValue(ctx, containerProps, "style", containerStyle);
+  
+  JSValueRef element = CreateElement(ctx, ViewComponent, containerProps, childCount, children);
+  return element;
+}
+
+static JSValueRef
+RenderButtonComponent(JSContextRef ctx) {
+  JSObjectRef ButtonComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "Button");
+  
+  JSObjectRef props = JSObjectMake(ctx, NULL, NULL);
+  ObjectSetString(ctx, props, "title", "pew pew peeeeeew");
+  JSValueRef element = CreateElement(ctx, ButtonComponent, props, 0, NULL);
+  
+  return element;
+}
+
+static JSValueRef
 NativeAppComponent(
   JSContextRef ctx,
   JSObjectRef function,
@@ -108,16 +183,8 @@ NativeAppComponent(
   const JSValueRef arguments[],
   JSValueRef* exception
 ) {
-  JSObjectRef ReactNativeModule = (JSObjectRef)Require(ctx, "node_modules/react-native/index.js");
-  JSObjectRef ReactModule = (JSObjectRef)Require(ctx, "node_modules/react/index.js");
-  JSObjectRef TextComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule, "Text");
-  
-  JSObjectRef props = JSObjectMake(ctx, NULL, NULL);
-  JSStringRef text = JSStringCreateWithUTF8CString("hello world");
-  JSObjectRef createElement = (JSObjectRef)ObjectGet(ctx, ReactModule, "createElement");
-  JSValueRef args[3] = { TextComponent, props, JSValueMakeString(ctx, text) };
-  JSValueRef element = JSObjectCallAsFunction(ctx, createElement, NULL, 3, args, NULL);
-  
+  JSValueRef children[1] = { RenderButtonComponent(ctx) };
+  JSValueRef element = RenderContainerComponent(ctx, 1, children);
   return element;
 }
 
