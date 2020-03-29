@@ -136,6 +136,10 @@ CreateElement(
     return NULL;
   }
 
+  if (props == NULL) {
+    props = JSObjectMake(ctx, NULL, NULL);
+  }
+
   JSValueRef args[3] = { component, props, childArray };
   JSValueRef element = JSObjectCallAsFunction(ctx, createElement, NULL, 3, args, NULL);
   return element;
@@ -164,13 +168,39 @@ RenderContainerComponent(JSContextRef ctx, size_t childCount, JSValueRef *childr
 }
 
 static JSValueRef
-RenderButtonComponent(JSContextRef ctx) {
-  JSObjectRef ButtonComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "Button");
-  
+PewPewPeeeeeewButtonComponent(
+  JSContextRef ctx,
+  JSObjectRef function,
+  JSObjectRef thisObject,
+  size_t argumentCount,
+  const JSValueRef arguments[],
+  JSValueRef* exception
+) {
+  JSObjectRef RNButtonComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "Button");
   JSObjectRef props = JSObjectMake(ctx, NULL, NULL);
   ObjectSetString(ctx, props, "title", "pew pew peeeeeew");
-  JSValueRef element = CreateElement(ctx, ButtonComponent, props, 0, NULL);
+  JSValueRef element = CreateElement(ctx, RNButtonComponent, props, 0, NULL);
   
+  return element;
+}
+static JSObjectRef
+GetPewPewPeeeeeewButtonComponent(JSContextRef ctx) {
+  static char *componentName = "PewPewpeeeeeewButtonComponent";
+  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
+  JSObjectRef component = (JSObjectRef)ObjectGet(ctx, globalObject, componentName);
+  if (component == JSValueMakeUndefined(ctx)) {
+    JSStringRef jsComponentName = JSStringCreateWithUTF8CString(componentName);
+    component = JSObjectMakeFunctionWithCallback(ctx, jsComponentName, &PewPewPeeeeeewButtonComponent);
+    JSStringRelease(jsComponentName);
+    ObjectSetValue(ctx, globalObject, componentName, component);
+  }
+  return component;
+}
+
+static JSValueRef
+RenderButtonComponent(JSContextRef ctx) {
+  JSObjectRef ButtonComponent = GetPewPewPeeeeeewButtonComponent(ctx);
+  JSValueRef element = CreateElement(ctx, ButtonComponent, NULL, 0, NULL);
   return element;
 }
 
