@@ -1,6 +1,7 @@
 #import "AppDelegate.h"
 
 #import <JavaScriptCore/JavaScriptCore.h>
+#import <Block.h>
 
 #import <React/RCTBridge.h>
 #import <React/RCTBridge+Private.h>
@@ -218,12 +219,29 @@ NativeAppComponent(
   return element;
 }
 
+static void
+DefineComponent(JSContextRef ctx, char *name, JSObjectCallAsFunctionCallback implementation) {
+  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
+  JSStringRef jsName = JSStringCreateWithUTF8CString(name);
+  
+  JSClassDefinition definition = {
+    
+  };
+  JSClassRef klass = JSClassCreate(<#const JSClassDefinition *definition#>)
+  
+  JSObjectCallAsFunctionCallback impl = Block_copy(implementation);
+  JSObjectRef functionObject = JSObjectMakeFunctionWithCallback(ctx, jsName, impl);
+  ObjectSetValue(ctx, globalObject, name, functionObject);
+  JSStringRelease(jsName);
+}
+
 - (void)bridgeDidInitializeJSGlobalContext:(void *)contextRef;
 {
   JSGlobalContextRef globalContext = contextRef;
   JSObjectRef globalObject = JSContextGetGlobalObject(globalContext);
 
   JSStringRef NativeAppComponentName = JSStringCreateWithUTF8CString("NativeAppComponent");
+  
   JSObjectRef functionObject = JSObjectMakeFunctionWithCallback(globalContext, NativeAppComponentName, &NativeAppComponent);
   JSObjectSetProperty(globalContext, globalObject, NativeAppComponentName, functionObject, kJSPropertyAttributeNone, NULL);
   JSStringRelease(NativeAppComponentName);
