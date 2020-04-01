@@ -39,9 +39,10 @@ ConsoleLog(JSContextRef ctx, JSValueRef value) {
 static JSValueRef
 Require(JSContextRef ctx, char *moduleId) {
   JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
+
   // This is Metro’s `require` function:
   // https://github.com/facebook/metro/blob/e8fecfea/packages/metro/src/lib/polyfills/require.js#L65
-  JSObjectRef requireFunction = (JSObjectRef)ObjectGet(ctx, globalObject, "__r");
+  JSObjectRef requireFunction = (JSObjectRef)ObjectGet(ctx, globalObject, "__r");\
 
   JSStringRef moduleIdName = JSStringCreateWithUTF8CString(moduleId);
   JSValueRef moduleIdNameValue = JSValueMakeString(ctx, moduleIdName);
@@ -101,21 +102,6 @@ DefineComponent(
 #pragma mark Initialize
 
 static SystemSoundID AirhornSoundID = 0;
-
-//- (void)bridgeDidInitializeJSGlobalContext:(void *)contextRef;
-//{
-//  JSGlobalContextRef ctx = contextRef;
-//
-//  if (AirhornSoundID == 0) {
-//    CFURLRef airhornSampleURL = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("dj-airhorn-sound-effect"), CFSTR("mp3"), NULL);
-//    AudioServicesCreateSystemSoundID(airhornSampleURL, &AirhornSoundID);
-//    CFRelease(airhornSampleURL);
-//  }
-//
-//  DefineComponent(ctx, "DJAirhornButtonComponent", &DJAirhornButtonComponent);
-//  DefineComponent(ctx, "ContainerComponent", &ContainerComponent);
-//  DefineComponent(ctx, "AppComponent", &AppComponent);
-//}
 
 #pragma mark -
 #pragma mark Components
@@ -200,7 +186,9 @@ AppComponent(
   JSObjectRef ButtonComponent = (JSObjectRef)ObjectGet(ctx, globalObject, "DJAirhornButtonComponent");
   JSObjectRef ContainerComponent = (JSObjectRef)ObjectGet(ctx, globalObject, "ContainerComponent");
 
-  JSValueRef buttonElement = ReactCreateElement(ctx, ButtonComponent, NULL, NULL);
+  JSObjectRef buttonProps = JSObjectMake(ctx, NULL, NULL);
+  ObjectSetString(ctx, buttonProps, "key", "epic-button");
+  JSValueRef buttonElement = ReactCreateElement(ctx, ButtonComponent, buttonProps, NULL);
 
   JSObjectRef children = JSObjectMakeArray(ctx, 1, &buttonElement, NULL);
   JSValueRef containerElement = ReactCreateElement(ctx, ContainerComponent, NULL, children);
