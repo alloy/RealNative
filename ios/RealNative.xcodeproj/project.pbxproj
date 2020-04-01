@@ -18,6 +18,7 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* RealNativeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* RealNativeTests.m */; };
 		5117ECB82434D5270035A3D0 /* dj-airhorn-sound-effect.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5117ECB72434D5260035A3D0 /* dj-airhorn-sound-effect.mp3 */; };
+		5117ECBB2434E1620035A3D0 /* Components.c in Sources */ = {isa = PBXBuildFile; fileRef = 5117ECBA2434E1620035A3D0 /* Components.c */; };
 		D0CA117C0A3A2737AA0E0EC7 /* libPods-RealNative-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39A34F9714928489A83E2C6A /* libPods-RealNative-tvOS.a */; };
 		EF5E19B30715E6A947A5EC11 /* libPods-RealNative-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F02B44DDC1F189C6C0223566 /* libPods-RealNative-tvOSTests.a */; };
 		FD50F709EA82298412DB8D60 /* libPods-RealNative-RealNativeTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 233147C030663DC2903E7C36 /* libPods-RealNative-RealNativeTests.a */; };
@@ -46,7 +47,6 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* RealNativeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RealNativeTests.m; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* RealNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RealNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RealNative/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = RealNative/AppDelegate.m; sourceTree = "<group>"; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RealNative/Images.xcassets; sourceTree = "<group>"; };
@@ -61,6 +61,8 @@
 		46D9CDC0E167B34C61F6B538 /* Pods-RealNative-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RealNative-tvOS.release.xcconfig"; path = "Target Support Files/Pods-RealNative-tvOS/Pods-RealNative-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		4977ACF6FF78766BB27E5256 /* Pods-RealNative-RealNativeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RealNative-RealNativeTests.release.xcconfig"; path = "Target Support Files/Pods-RealNative-RealNativeTests/Pods-RealNative-RealNativeTests.release.xcconfig"; sourceTree = "<group>"; };
 		5117ECB72434D5260035A3D0 /* dj-airhorn-sound-effect.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "dj-airhorn-sound-effect.mp3"; path = "../dj-airhorn-sound-effect.mp3"; sourceTree = "<group>"; };
+		5117ECB92434E1620035A3D0 /* Components.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Components.h; path = RealNative/Components.h; sourceTree = "<group>"; };
+		5117ECBA2434E1620035A3D0 /* Components.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Components.c; path = RealNative/Components.c; sourceTree = "<group>"; };
 		746C9677B7BBFCDD8B415D90 /* Pods-RealNative-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RealNative-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-RealNative-tvOSTests/Pods-RealNative-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		A7D03413498778212A72C6BA /* libPods-RealNative.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RealNative.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDEBCF258429A64264F66A7D /* Pods-RealNative.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RealNative.release.xcconfig"; path = "Target Support Files/Pods-RealNative/Pods-RealNative.release.xcconfig"; sourceTree = "<group>"; };
@@ -129,12 +131,13 @@
 			children = (
 				5117ECB72434D5260035A3D0 /* dj-airhorn-sound-effect.mp3 */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
-				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				5117ECB92434E1620035A3D0 /* Components.h */,
+				5117ECBA2434E1620035A3D0 /* Components.c */,
 			);
 			name = RealNative;
 			sourceTree = "<group>";
@@ -533,6 +536,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5117ECBB2434E1620035A3D0 /* Components.c in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
@@ -634,6 +638,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"FB_SONARKIT_ENABLED=1",
@@ -660,6 +665,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				INFOPLIST_FILE = RealNative/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
