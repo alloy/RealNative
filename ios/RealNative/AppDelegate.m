@@ -119,28 +119,23 @@ Require(JSContextRef ctx, char *moduleId) {
 }
 
 static JSValueRef
-CreateElement(
+ReactCreateElement(
   JSContextRef ctx,
   JSObjectRef component,
   JSObjectRef props,
-  size_t childCount,
-  JSValueRef *children
+  JSValueRef children
 ) {
   JSObjectRef ReactModule = (JSObjectRef)Require(ctx, "node_modules/react/index.js");
   JSObjectRef createElement = (JSObjectRef)ObjectGet(ctx, ReactModule, "createElement");
 
-  JSValueRef error = NULL;
-  JSObjectRef childArray = JSObjectMakeArray(ctx, childCount, children, &error);
-  if (error) {
-    ConsoleLog(ctx, error);
-    return NULL;
+  if (children == NULL) {
+    children = JSObjectMakeArray(ctx, 0, NULL, NULL);
   }
-
   if (props == NULL) {
     props = JSObjectMake(ctx, NULL, NULL);
   }
 
-  JSValueRef args[3] = { component, props, childArray };
+  JSValueRef args[3] = { component, props, children };
   JSValueRef element = JSObjectCallAsFunction(ctx, createElement, NULL, 3, args, NULL);
   return element;
 }
@@ -150,25 +145,50 @@ ReactNativeModule(JSContextRef ctx) {
   return (JSObjectRef)Require(ctx, "node_modules/react-native/index.js");
 }
 
+static void
+DefineComponent(
+  JSContextRef ctx,
+  char *componentName,
+  JSObjectCallAsFunctionCallback componentImplementation
+) {
+  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
+  JSStringRef jsComponentName = JSStringCreateWithUTF8CString(componentName);
+  JSObjectRef component = JSObjectMakeFunctionWithCallback(ctx, jsComponentName, componentImplementation);
+  JSStringRelease(jsComponentName);
+  ObjectSetValue(ctx, globalObject, componentName, component);
+}
+
+// ----
+
 static JSValueRef
-RenderContainerComponent(JSContextRef ctx, size_t childCount, JSValueRef *children) {
+ContainerComponent(
+  JSContextRef ctx,
+  JSObjectRef function,
+  JSObjectRef thisObject,
+  size_t argumentCount,
+  const JSValueRef arguments[],
+  JSValueRef* exception
+) {
   JSObjectRef ViewComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "View");
+
+  JSObjectRef props = (JSObjectRef)arguments[0];
+  JSObjectRef children = (JSObjectRef)ObjectGet(ctx, props, "children");
 
   JSObjectRef containerStyle = JSObjectMake(ctx, NULL, NULL);
   ObjectSetNumber(ctx, containerStyle, "flex", 1);
 //  ObjectSetString(ctx, containerStyle, "backgroundColor", "red");
   ObjectSetString(ctx, containerStyle, "justifyContent", "center");
   ObjectSetString(ctx, containerStyle, "alignItems", "center");
-  
+
   JSObjectRef containerProps = JSObjectMake(ctx, NULL, NULL);
   ObjectSetValue(ctx, containerProps, "style", containerStyle);
-  
-  JSValueRef element = CreateElement(ctx, ViewComponent, containerProps, childCount, children);
+
+  JSValueRef element = ReactCreateElement(ctx, ViewComponent, containerProps, children);
   return element;
 }
 
 static JSValueRef
-PewPewPeeeeeewButtonComponent(
+DJAirhornButtonComponent(
   JSContextRef ctx,
   JSObjectRef function,
   JSObjectRef thisObject,
@@ -179,28 +199,8 @@ PewPewPeeeeeewButtonComponent(
   JSObjectRef RNButtonComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "Button");
   JSObjectRef props = JSObjectMake(ctx, NULL, NULL);
   ObjectSetString(ctx, props, "title", "pew pew peeeeeew");
-  JSValueRef element = CreateElement(ctx, RNButtonComponent, props, 0, NULL);
+  JSValueRef element = ReactCreateElement(ctx, RNButtonComponent, props, NULL);
   
-  return element;
-}
-static JSObjectRef
-GetPewPewPeeeeeewButtonComponent(JSContextRef ctx) {
-  static char *componentName = "PewPewpeeeeeewButtonComponent";
-  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
-  JSObjectRef component = (JSObjectRef)ObjectGet(ctx, globalObject, componentName);
-  if (component == JSValueMakeUndefined(ctx)) {
-    JSStringRef jsComponentName = JSStringCreateWithUTF8CString(componentName);
-    component = JSObjectMakeFunctionWithCallback(ctx, jsComponentName, &PewPewPeeeeeewButtonComponent);
-    JSStringRelease(jsComponentName);
-    ObjectSetValue(ctx, globalObject, componentName, component);
-  }
-  return component;
-}
-
-static JSValueRef
-RenderButtonComponent(JSContextRef ctx) {
-  JSObjectRef ButtonComponent = GetPewPewPeeeeeewButtonComponent(ctx);
-  JSValueRef element = CreateElement(ctx, ButtonComponent, NULL, 0, NULL);
   return element;
 }
 
@@ -213,20 +213,28 @@ NativeAppComponent(
   const JSValueRef arguments[],
   JSValueRef* exception
 ) {
-  JSValueRef children[1] = { RenderButtonComponent(ctx) };
-  JSValueRef element = RenderContainerComponent(ctx, 1, children);
-  return element;
+  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
+  JSObjectRef ButtonComponent = (JSObjectRef)ObjectGet(ctx, globalObject, "DJAirhornButtonComponent");
+  JSObjectRef ContainerComponent = (JSObjectRef)ObjectGet(ctx, globalObject, "ContainerComponent");
+
+  JSValueRef buttonElement = ReactCreateElement(ctx, ButtonComponent, NULL, NULL);
+
+  JSObjectRef children = JSObjectMakeArray(ctx, 1, &buttonElement, NULL);
+  JSValueRef containerElement = ReactCreateElement(ctx, ContainerComponent, NULL, children);
+
+  // Get your console.log debugging on!
+  ConsoleLog(ctx, containerElement);
+
+  return containerElement;
 }
 
 - (void)bridgeDidInitializeJSGlobalContext:(void *)contextRef;
 {
-  JSGlobalContextRef globalContext = contextRef;
-  JSObjectRef globalObject = JSContextGetGlobalObject(globalContext);
+  JSGlobalContextRef ctx = contextRef;
 
-  JSStringRef NativeAppComponentName = JSStringCreateWithUTF8CString("NativeAppComponent");
-  JSObjectRef functionObject = JSObjectMakeFunctionWithCallback(globalContext, NativeAppComponentName, &NativeAppComponent);
-  JSObjectSetProperty(globalContext, globalObject, NativeAppComponentName, functionObject, kJSPropertyAttributeNone, NULL);
-  JSStringRelease(NativeAppComponentName);
+  DefineComponent(ctx, "DJAirhornButtonComponent", &DJAirhornButtonComponent);
+  DefineComponent(ctx, "ContainerComponent", &ContainerComponent);
+  DefineComponent(ctx, "NativeAppComponent", &NativeAppComponent);
 }
 
 @end
