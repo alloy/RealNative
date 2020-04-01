@@ -9,6 +9,14 @@ static SystemSoundID AirhornSoundID = 0;
 #pragma mark -
 #pragma mark Components
 
+/**
+ * ```js
+ * () => {
+ *   AudioServicesPlaySystemSound(AirhornSoundID);
+ *   console.log("Pew Pew Peeeeeew");
+ * }
+ * ```
+ */
 static JSValueRef
 DJAirhornButtonOnPressHandler(
   JSContextRef ctx,
@@ -27,6 +35,18 @@ DJAirhornButtonOnPressHandler(
   return JSValueMakeUndefined(ctx);
 }
 
+/**
+ * ```js
+ * () => {
+ *   const RNButtonComponent = require("react-native").Button;
+ *   const props = {
+ *     title: "Pew Pew Peeeeeew",
+ *     onPress: DJAirhornButtonOnPressHandler,
+ *   };
+ *   return React.createElement(RNButtonComponent, props);
+ * }
+ * ```
+ */
 static JSValueRef
 DJAirhornButtonComponent(
   JSContextRef ctx,
@@ -46,6 +66,24 @@ DJAirhornButtonComponent(
   return element;
 }
 
+/**
+ * ```js
+ * (props) => {
+ *   const RNViewComponent = require("react-native").View;
+ *   const children = props.children;
+ *   const containerStyle = {
+ *     flex: 1,
+ *     backgroundColor: "#f60",
+ *     justifyContent: "center",
+ *     alignItems: "center",
+ *   };
+ *   const containerProps = {
+ *     style: containerStyle,
+ *   };
+ *   return React.createElement(RNViewComponent, containerProps, children);
+ * }
+ * ```
+ */
 static JSValueRef
 ContainerComponent(
   JSContextRef ctx,
@@ -55,7 +93,7 @@ ContainerComponent(
   const JSValueRef arguments[],
   JSValueRef* exception
 ) {
-  JSObjectRef ViewComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "View");
+  JSObjectRef RNViewComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "View");
 
   JSObjectRef props = (JSObjectRef)arguments[0];
   JSObjectRef children = (JSObjectRef)ObjectGet(ctx, props, "children");
@@ -72,10 +110,26 @@ ContainerComponent(
   JSObjectRef containerProps = JSObjectMake(ctx, NULL, NULL);
   ObjectSetValue(ctx, containerProps, "style", containerStyle);
 
-  JSValueRef element = ReactCreateElement(ctx, ViewComponent, containerProps, children);
+  JSValueRef element = ReactCreateElement(ctx, RNViewComponent, containerProps, children);
   return element;
 }
 
+/**
+ * ```js
+ * (props) => {
+ *   const buttonProps = {
+ *     key: "epic-button",
+ *   };
+ *   const buttonElement = React.createElement(DJAirhornButtonComponent, buttonProps);
+ *   const containerProps = {
+ *     style: containerStyle,
+ *   };
+ *   const containerElement = React.createElement(ContainerComponent, null, [buttonElement]);
+ *   console.log(containerElement);
+ *   return containerElement;
+ * }
+ * ```
+ */
 static JSValueRef
 AppComponent(
   JSContextRef ctx,
@@ -86,12 +140,12 @@ AppComponent(
   JSValueRef* exception
 ) {
   JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
-  JSObjectRef ButtonComponent = (JSObjectRef)ObjectGet(ctx, globalObject, "DJAirhornButtonComponent");
+  JSObjectRef DJAirhornButtonComponent = (JSObjectRef)ObjectGet(ctx, globalObject, "DJAirhornButtonComponent");
   JSObjectRef ContainerComponent = (JSObjectRef)ObjectGet(ctx, globalObject, "ContainerComponent");
 
   JSObjectRef buttonProps = JSObjectMake(ctx, NULL, NULL);
   ObjectSetString(ctx, buttonProps, "key", "epic-button");
-  JSValueRef buttonElement = ReactCreateElement(ctx, ButtonComponent, buttonProps, NULL);
+  JSValueRef buttonElement = ReactCreateElement(ctx, DJAirhornButtonComponent, buttonProps, NULL);
 
   JSObjectRef children = JSObjectMakeArray(ctx, 1, &buttonElement, NULL);
   JSValueRef containerElement = ReactCreateElement(ctx, ContainerComponent, NULL, children);
