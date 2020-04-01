@@ -7,9 +7,7 @@
 ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝  ╚══════╝
 ```
 
-A [React Native](https://reactnative.dev) application with _only_ user-land **C** code. For those of us that _do_ want to make use of React’s approach to defining views, but also realize that modern languages like **Objective-C** and **Swift** are just not good enough.
-
-Really, stitching together views needs to be optimized as much as possible. (PRs to port this code to assembler are much appreciated.)
+A [React Native](https://reactnative.dev) application with _only_ user-land **C** code. For those of us that _do_ want to make use of React’s approach to defining views, but also realize that modern languages like **Objective-C** and **Swift** are just too high-level. Really, stitching together views needs to be optimized as much as possible. (PRs to port this code to assembler are much appreciated.)
 
 Highlights include:
 
@@ -17,7 +15,7 @@ Highlights include:
 * No longer be required to neatly separate view/controller code from native [threaded] code that affects the entire system.
 * Actual **C**SS (even if just flexbox).
 
-See the [Components.c](./src/Components.c) file for the definitions of the components that make up the app and as a starting point to browse from.
+See the [Components.c](./src/Components.c) file for the definitions of the components that make up the app and as a starting point to browse [the rest of the user-land source](./src) from.
 
 ## Install
 
