@@ -1,6 +1,7 @@
 #import "AppDelegate.h"
 
 #import <JavaScriptCore/JavaScriptCore.h>
+#import <AudioToolbox/AudioToolbox.h>
 
 #import <React/RCTBridge.h>
 #import <React/RCTBridge+Private.h>
@@ -158,7 +159,65 @@ DefineComponent(
   ObjectSetValue(ctx, globalObject, componentName, component);
 }
 
-// ----
+#pragma mark -
+#pragma mark Initialize
+
+static SystemSoundID AirhornSoundID = 0;
+
+- (void)bridgeDidInitializeJSGlobalContext:(void *)contextRef;
+{
+  JSGlobalContextRef ctx = contextRef;
+
+  if (AirhornSoundID == 0) {
+    CFURLRef airhornSampleURL = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("dj-airhorn-sound-effect"), CFSTR("mp3"), NULL);
+    AudioServicesCreateSystemSoundID(airhornSampleURL, &AirhornSoundID);
+    CFRelease(airhornSampleURL);
+  }
+
+  DefineComponent(ctx, "DJAirhornButtonComponent", &DJAirhornButtonComponent);
+  DefineComponent(ctx, "ContainerComponent", &ContainerComponent);
+  DefineComponent(ctx, "AppComponent", &AppComponent);
+}
+
+#pragma mark -
+#pragma mark Components
+
+static JSValueRef
+DJAirhornButtonComponent(
+  JSContextRef ctx,
+  JSObjectRef function,
+  JSObjectRef thisObject,
+  size_t argumentCount,
+  const JSValueRef arguments[],
+  JSValueRef* exception
+) {
+  JSObjectRef RNButtonComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "Button");
+
+  JSObjectRef props = JSObjectMake(ctx, NULL, NULL);
+  ObjectSetString(ctx, props, "title", "Pew Pew Peeeeeew");
+  ObjectSetValue(ctx, props, "onPress", JSObjectMakeFunctionWithCallback(ctx, NULL, &DJAirhornButtonOnPressHandler));
+
+  JSValueRef element = ReactCreateElement(ctx, RNButtonComponent, props, NULL);
+  return element;
+}
+
+static JSValueRef
+DJAirhornButtonOnPressHandler(
+  JSContextRef ctx,
+  JSObjectRef function,
+  JSObjectRef thisObject,
+  size_t argumentCount,
+  const JSValueRef arguments[],
+  JSValueRef* exception
+) {
+  AudioServicesPlaySystemSound(AirhornSoundID);
+
+  JSStringRef message = JSStringCreateWithUTF8CString("Pew Pew Peeeeeew");
+  ConsoleLog(ctx, JSValueMakeString(ctx, message));
+  JSStringRelease(message);
+
+  return JSValueMakeUndefined(ctx);
+}
 
 static JSValueRef
 ContainerComponent(
@@ -174,9 +233,12 @@ ContainerComponent(
   JSObjectRef props = (JSObjectRef)arguments[0];
   JSObjectRef children = (JSObjectRef)ObjectGet(ctx, props, "children");
 
+  /**
+   * Putting the C back in CSS
+   */
   JSObjectRef containerStyle = JSObjectMake(ctx, NULL, NULL);
   ObjectSetNumber(ctx, containerStyle, "flex", 1);
-//  ObjectSetString(ctx, containerStyle, "backgroundColor", "red");
+  ObjectSetString(ctx, containerStyle, "backgroundColor", "#f60");
   ObjectSetString(ctx, containerStyle, "justifyContent", "center");
   ObjectSetString(ctx, containerStyle, "alignItems", "center");
 
@@ -188,24 +250,7 @@ ContainerComponent(
 }
 
 static JSValueRef
-DJAirhornButtonComponent(
-  JSContextRef ctx,
-  JSObjectRef function,
-  JSObjectRef thisObject,
-  size_t argumentCount,
-  const JSValueRef arguments[],
-  JSValueRef* exception
-) {
-  JSObjectRef RNButtonComponent = (JSObjectRef)ObjectGet(ctx, ReactNativeModule(ctx), "Button");
-  JSObjectRef props = JSObjectMake(ctx, NULL, NULL);
-  ObjectSetString(ctx, props, "title", "pew pew peeeeeew");
-  JSValueRef element = ReactCreateElement(ctx, RNButtonComponent, props, NULL);
-  
-  return element;
-}
-
-static JSValueRef
-NativeAppComponent(
+AppComponent(
   JSContextRef ctx,
   JSObjectRef function,
   JSObjectRef thisObject,
@@ -226,15 +271,6 @@ NativeAppComponent(
   ConsoleLog(ctx, containerElement);
 
   return containerElement;
-}
-
-- (void)bridgeDidInitializeJSGlobalContext:(void *)contextRef;
-{
-  JSGlobalContextRef ctx = contextRef;
-
-  DefineComponent(ctx, "DJAirhornButtonComponent", &DJAirhornButtonComponent);
-  DefineComponent(ctx, "ContainerComponent", &ContainerComponent);
-  DefineComponent(ctx, "NativeAppComponent", &NativeAppComponent);
 }
 
 @end
