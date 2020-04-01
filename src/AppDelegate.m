@@ -33,7 +33,7 @@ InitializeFlipper(void *application)
   objc_msgSend(flipperClient, sel_getUid("start"));
 }
 
-BOOL
+static BOOL
 AppDelegate_didFinishLaunching(struct AppDelegate *self, SEL _cmd, void *application, void *options)
 {
   InitializeFlipper(application);
@@ -55,13 +55,13 @@ AppDelegate_didFinishLaunching(struct AppDelegate *self, SEL _cmd, void *applica
   return YES;
 }
 
-id
+static id
 AppDelegate_window(struct AppDelegate *self, SEL _cmd)
 {
   return self->window;
 }
 
-id
+static id
 AppDelegate_sourceURLForBridge(struct AppDelegate *self, SEL _cmd, id bridge)
 {
   return objc_msgSend(objc_msgSend(objc_getClass("RCTBundleURLProvider"), sel_getUid("sharedSettings")), sel_getUid("jsBundleURLForBundleRoot:fallbackResource:"), CFSTR("index"), NULL);

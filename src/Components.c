@@ -1,105 +1,8 @@
 #import "Components.h"
+#import "Utils.h"
+#import "ReactNative.h"
+
 #import <AudioToolbox/AudioToolbox.h>
-
-static JSValueRef
-ObjectGet(JSContextRef ctx, JSObjectRef obj, char *key) {
-  JSStringRef keyName = JSStringCreateWithUTF8CString(key);
-  JSValueRef result = JSObjectGetProperty(ctx, obj, keyName, NULL);
-  JSStringRelease(keyName);
-  return result;
-}
-
-static void
-ObjectSetValue(JSContextRef ctx, JSObjectRef obj, char *key, JSValueRef value) {
-  JSStringRef k = JSStringCreateWithUTF8CString(key);
-  JSObjectSetProperty(ctx, obj, k, value, kJSPropertyAttributeNone, NULL);
-  JSStringRelease(k);
-}
-
-static void
-ObjectSetString(JSContextRef ctx, JSObjectRef obj, char *key, char *value) {
-  JSStringRef v = JSStringCreateWithUTF8CString(value);
-  ObjectSetValue(ctx, obj, key, JSValueMakeString(ctx, v));
-  JSStringRelease(v);
-}
-
-static void
-ObjectSetNumber(JSContextRef ctx, JSObjectRef obj, char *key, double value) {
-  ObjectSetValue(ctx, obj, key, JSValueMakeNumber(ctx, value));
-}
-
-static void
-ConsoleLog(JSContextRef ctx, JSValueRef value) {
-  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
-  JSObjectRef consoleObject = (JSObjectRef)ObjectGet(ctx, globalObject, "console");
-  JSObjectRef logFunction = (JSObjectRef)ObjectGet(ctx, consoleObject, "log");
-  JSObjectCallAsFunction(ctx, logFunction, NULL, 1, &value, NULL);
-}
-
-static JSValueRef
-Require(JSContextRef ctx, char *moduleId) {
-  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
-
-  // This is Metro’s `require` function:
-  // https://github.com/facebook/metro/blob/e8fecfea/packages/metro/src/lib/polyfills/require.js#L65
-  JSObjectRef requireFunction = (JSObjectRef)ObjectGet(ctx, globalObject, "__r");\
-
-  JSStringRef moduleIdName = JSStringCreateWithUTF8CString(moduleId);
-  JSValueRef moduleIdNameValue = JSValueMakeString(ctx, moduleIdName);
-  JSValueRef error = NULL;
-  JSValueRef result = JSObjectCallAsFunction(ctx, requireFunction, NULL, 1, &moduleIdNameValue, &error);
-  JSStringRelease(moduleIdName);
-
-  if (error) {
-    ConsoleLog(ctx, error);
-    return NULL;
-  } else {
-    return result;
-  }
-}
-
-static JSValueRef
-ReactCreateElement(
-  JSContextRef ctx,
-  JSObjectRef component,
-  JSObjectRef props,
-  JSValueRef children
-) {
-  JSObjectRef ReactModule = (JSObjectRef)Require(ctx, "node_modules/react/index.js");
-  JSObjectRef createElement = (JSObjectRef)ObjectGet(ctx, ReactModule, "createElement");
-
-  if (children == NULL) {
-    children = JSObjectMakeArray(ctx, 0, NULL, NULL);
-  }
-  if (props == NULL) {
-    props = JSObjectMake(ctx, NULL, NULL);
-  }
-
-  JSValueRef args[3] = { component, props, children };
-  JSValueRef element = JSObjectCallAsFunction(ctx, createElement, NULL, 3, args, NULL);
-  return element;
-}
-
-static JSObjectRef
-ReactNativeModule(JSContextRef ctx) {
-  return (JSObjectRef)Require(ctx, "node_modules/react-native/index.js");
-}
-
-static void
-DefineComponent(
-  JSContextRef ctx,
-  char *componentName,
-  JSObjectCallAsFunctionCallback componentImplementation
-) {
-  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
-  JSStringRef jsComponentName = JSStringCreateWithUTF8CString(componentName);
-  JSObjectRef component = JSObjectMakeFunctionWithCallback(ctx, jsComponentName, componentImplementation);
-  JSStringRelease(jsComponentName);
-  ObjectSetValue(ctx, globalObject, componentName, component);
-}
-
-#pragma mark -
-#pragma mark Initialize
 
 static SystemSoundID AirhornSoundID = 0;
 
@@ -197,6 +100,22 @@ AppComponent(
   ConsoleLog(ctx, containerElement);
 
   return containerElement;
+}
+
+#pragma mark -
+#pragma mark Initialize
+
+static void
+DefineComponent(
+  JSContextRef ctx,
+  char *componentName,
+  JSObjectCallAsFunctionCallback componentImplementation
+) {
+  JSObjectRef globalObject = JSContextGetGlobalObject(ctx);
+  JSStringRef jsComponentName = JSStringCreateWithUTF8CString(componentName);
+  JSObjectRef component = JSObjectMakeFunctionWithCallback(ctx, jsComponentName, componentImplementation);
+  JSStringRelease(jsComponentName);
+  ObjectSetValue(ctx, globalObject, componentName, component);
 }
 
 void DefineComponents(JSContextRef ctx)

@@ -14,6 +14,8 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		5117ECB82434D5270035A3D0 /* dj-airhorn-sound-effect.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5117ECB72434D5260035A3D0 /* dj-airhorn-sound-effect.mp3 */; };
 		5117ECBB2434E1620035A3D0 /* Components.c in Sources */ = {isa = PBXBuildFile; fileRef = 5117ECBA2434E1620035A3D0 /* Components.c */; };
+		5117ECBE2434F2F20035A3D0 /* Utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 5117ECBD2434F2F20035A3D0 /* Utils.c */; };
+		5117ECC12434F3F80035A3D0 /* ReactNative.c in Sources */ = {isa = PBXBuildFile; fileRef = 5117ECC02434F3F70035A3D0 /* ReactNative.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,10 @@
 		5117ECB72434D5260035A3D0 /* dj-airhorn-sound-effect.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "dj-airhorn-sound-effect.mp3"; path = "../dj-airhorn-sound-effect.mp3"; sourceTree = "<group>"; };
 		5117ECB92434E1620035A3D0 /* Components.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Components.h; path = ../src/Components.h; sourceTree = "<group>"; };
 		5117ECBA2434E1620035A3D0 /* Components.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = Components.c; path = ../src/Components.c; sourceTree = "<group>"; };
+		5117ECBC2434F2F20035A3D0 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Utils.h; path = ../src/Utils.h; sourceTree = "<group>"; };
+		5117ECBD2434F2F20035A3D0 /* Utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Utils.c; path = ../src/Utils.c; sourceTree = "<group>"; };
+		5117ECBF2434F3F70035A3D0 /* ReactNative.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ReactNative.h; path = ../src/ReactNative.h; sourceTree = "<group>"; };
+		5117ECC02434F3F70035A3D0 /* ReactNative.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ReactNative.c; path = ../src/ReactNative.c; sourceTree = "<group>"; };
 		746C9677B7BBFCDD8B415D90 /* Pods-RealNative-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RealNative-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-RealNative-tvOSTests/Pods-RealNative-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		A7D03413498778212A72C6BA /* libPods-RealNative.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RealNative.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CDEBCF258429A64264F66A7D /* Pods-RealNative.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RealNative.release.xcconfig"; path = "Target Support Files/Pods-RealNative/Pods-RealNative.release.xcconfig"; sourceTree = "<group>"; };
@@ -57,14 +63,18 @@
 		13B07FAE1A68108700A75B9A /* RealNative */ = {
 			isa = PBXGroup;
 			children = (
-				5117ECB72434D5260035A3D0 /* dj-airhorn-sound-effect.mp3 */,
+				13B07FB71A68108700A75B9A /* main.m */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
+				5117ECBF2434F3F70035A3D0 /* ReactNative.h */,
+				5117ECC02434F3F70035A3D0 /* ReactNative.c */,
+				5117ECBC2434F2F20035A3D0 /* Utils.h */,
+				5117ECBD2434F2F20035A3D0 /* Utils.c */,
+				5117ECB92434E1620035A3D0 /* Components.h */,
+				5117ECBA2434E1620035A3D0 /* Components.c */,
+				5117ECB72434D5260035A3D0 /* dj-airhorn-sound-effect.mp3 */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
-				13B07FB71A68108700A75B9A /* main.m */,
-				5117ECB92434E1620035A3D0 /* Components.h */,
-				5117ECBA2434E1620035A3D0 /* Components.c */,
 			);
 			name = RealNative;
 			sourceTree = "<group>";
@@ -256,7 +266,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5117ECBE2434F2F20035A3D0 /* Utils.c in Sources */,
 				5117ECBB2434E1620035A3D0 /* Components.c in Sources */,
+				5117ECC12434F3F80035A3D0 /* ReactNative.c in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
