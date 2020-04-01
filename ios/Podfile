@@ -54,11 +54,6 @@ target 'RealNative' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-  target 'RealNativeTests' do
-    inherit! :complete
-    # Pods for testing
-  end
-
   use_native_modules!
 
   # Enables Flipper.
@@ -68,14 +63,5 @@ target 'RealNative' do
   add_flipper_pods!
   post_install do |installer|
     flipper_post_install(installer)
-  end
-end
-
-target 'RealNative-tvOS' do
-  # Pods for RealNative-tvOS
-
-  target 'RealNative-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
   end
 end
