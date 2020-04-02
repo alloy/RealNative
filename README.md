@@ -7,6 +7,8 @@
 ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝  ╚══════╝
 ```
 
+ℹ️ _This was [an April Fool’s 2020 project](https://twitter.com/alloy/status/1245654709421002754). While there may be interesting learnings to take away from this, I would not advice creating applications in this manner generally._
+
 A [React Native](https://reactnative.dev) application with _only_ user-land **C** code. For those of us that _do_ want to make use of React’s approach to defining views, but also realize that modern languages like **Objective-C** and **Swift** are just too high-level. Really, stitching together views needs to be optimized as much as possible. (PRs to port this code to assembler are much appreciated.)
 
 Highlights include:
