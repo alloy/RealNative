@@ -1,7 +1,3 @@
-diff --git a/node_modules/react-native/React/.DS_Store b/node_modules/react-native/React/.DS_Store
-new file mode 100644
-index 0000000..840d889
-Binary files /dev/null and b/node_modules/react-native/React/.DS_Store differ
 diff --git a/node_modules/react-native/React/Base/RCTBridgeDelegate.h b/node_modules/react-native/React/Base/RCTBridgeDelegate.h
 index 2ae1b8b..483ef48 100644
 --- a/node_modules/react-native/React/Base/RCTBridgeDelegate.h
@@ -9,7 +5,7 @@ index 2ae1b8b..483ef48 100644
 @@ -77,4 +77,6 @@
   */
  - (NSDictionary<NSString *, Class> *)extraLazyModuleClassesForBridge:(RCTBridge *)bridge;
- 
+
 +- (void)bridgeDidInitializeJSGlobalContext:(void *)contextRef;
 +
  @end
@@ -21,13 +17,13 @@ index 18b0e09..f83c283 100644
    dispatch_group_enter(prepareBridge);
    [self ensureOnJavaScriptThread:^{
      [weakSelf _initializeBridge:executorFactory];
-+      
++
 +    facebook::jsi::Runtime &runtime = *(facebook::jsi::Runtime *)weakSelf.runtime;
 +    [weakSelf.delegate bridgeDidInitializeJSGlobalContext:runtime.context()];
 +
      dispatch_group_leave(prepareBridge);
    }];
- 
+
 diff --git a/node_modules/react-native/ReactCommon/jsi/JSCRuntime.cpp b/node_modules/react-native/ReactCommon/jsi/JSCRuntime.cpp
 index a6e59fb..cac57f6 100644
 --- a/node_modules/react-native/ReactCommon/jsi/JSCRuntime.cpp
@@ -35,16 +31,16 @@ index a6e59fb..cac57f6 100644
 @@ -51,6 +51,8 @@ class JSCRuntime : public jsi::Runtime {
        const std::string& sourceURL) override;
    jsi::Object global() override;
-     
+
 +  void * context() override;
 +
    std::string description() override;
- 
+
    bool isInspectable() override;
 @@ -403,6 +405,10 @@ jsi::Object JSCRuntime::global() {
    return createObject(JSContextGetGlobalObject(ctx_));
  }
- 
+
 +void * JSCRuntime::context() {
 +  return ctx_;
 +}
@@ -59,16 +55,9 @@ index 33e3008..835f517 100644
 @@ -188,6 +188,8 @@ class Runtime {
    /// \return the global object
    virtual Object global() = 0;
-     
+
 +  virtual void *context() = 0;
 +
    /// \return a short printable description of the instance.  This
    /// should only be used by logging, debugging, and other
    /// developer-facing callers.
-diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
-new file mode 100644
-index 0000000..361f5fb
---- /dev/null
-+++ b/node_modules/react-native/scripts/.packager.env
-@@ -0,0 +1 @@
-+export RCT_METRO_PORT=8081

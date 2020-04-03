@@ -1,8 +1,8 @@
 ```
 ██████╗ ███████╗ █████╗ ██╗         ███╗   ██╗ █████╗ ████████╗██╗██╗   ██╗███████╗
 ██╔══██╗██╔════╝██╔══██╗██║         ████╗  ██║██╔══██╗╚══██╔══╝██║██║   ██║██╔════╝
-██████╔╝█████╗  ███████║██║         ██╔██╗ ██║███████║   ██║   ██║██║   ██║█████╗  
-██╔══██╗██╔══╝  ██╔══██║██║         ██║╚██╗██║██╔══██║   ██║   ██║╚██╗ ██╔╝██╔══╝  
+██████╔╝█████╗  ███████║██║         ██╔██╗ ██║███████║   ██║   ██║██║   ██║█████╗
+██╔══██╗██╔══╝  ██╔══██║██║         ██║╚██╗██║██╔══██║   ██║   ██║╚██╗ ██╔╝██╔══╝
 ██║  ██║███████╗██║  ██║███████╗    ██║ ╚████║██║  ██║   ██║   ██║ ╚████╔╝ ███████╗
 ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝    ╚═╝  ╚═══╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═══╝  ╚══════╝
 ```
@@ -21,14 +21,11 @@ See the [Components.c](./src/Components.c) file for the definitions of the compo
 
 ## Install
 
-```bash
-git clone https://github.com/alloy/RealNative.git
-cd RealNative
-yarn install
-cd ios
-pod install
-cd ..
-npx react-native run-ios
+```sh
+git clone https://github.com/alloy/RealNative.git && cd RealNative
+yarn
+pushd ios && pod install && popd
+yarn ios
 ```
 
 ## LICENSE
